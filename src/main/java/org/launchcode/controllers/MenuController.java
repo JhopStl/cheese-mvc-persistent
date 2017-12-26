@@ -1,9 +1,11 @@
 package org.launchcode.controllers;
 
 
+import org.launchcode.models.Cheese;
 import org.launchcode.models.Menu;
 import org.launchcode.models.data.CheeseDao;
 import org.launchcode.models.data.MenuDao;
+import org.launchcode.models.forms.AddMenuItemForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -55,7 +57,7 @@ public class MenuController {
             return "menu/add";
         }
 
-        //if no errors, save the new menu item given by form to DB has object
+        //if no errors, save the new menu item given by form to DB and generates ID for menu
         menuDao.save(menu);
         return "redirect:view/" + menu.getId();
     }
@@ -67,12 +69,58 @@ public class MenuController {
 
         //fetch the particular method that we will want to look at
         Menu menu = menuDao.findOne(menuId);
-        model.addAttribute("Title", menu.getName());
+        model.addAttribute("title", menu.getName());
         model.addAttribute("menu", menu);
         //model.addAttribute("cheeses", menu.getCheeses());
         //model.addAttribute("menuId", menu.getId());
 
         return "menu/view";
+    }
+
+    //add menu handler
+    //display form
+    @RequestMapping(value="add-item/{menuId}", method=RequestMethod.GET)
+    public String addMenuItemForm (Model model, @PathVariable int menuId) {
+        //menuId tell us which menu the user intends to add cheeses to
+
+        //fetch menu
+        Menu menu = menuDao.findOne(menuId);
+
+        //create instance of Menu Item Form with the given Menu object and a list of all Cheese items
+        AddMenuItemForm form = new AddMenuItemForm(menu, cheeseDao.findAll());
+
+        //pass form object into view
+        model.addAttribute("form", form);
+
+        //add title
+        model.addAttribute("title","Add item to menu: " + menu.getName());
+
+        return "menu/add-item";
+    }
+
+    //process add menu item form
+    @RequestMapping(value ="add-item", method = RequestMethod.POST)
+    public String addMenuItemForm(Model model, @ModelAttribute @Valid AddMenuItemForm form, Errors errors) {
+
+        if (errors.hasErrors()){
+            //return the form
+            model.addAttribute("form", form);
+
+            return "menu/add-item";
+        }
+
+        //Find cheese and menu by id
+       Cheese aCheese = cheeseDao.findOne(form.getCheeseId());
+        Menu aMenu = menuDao.findOne(form.getMenuId());
+
+        //call addItem utility method to add item/cheese to the menu
+        //check this- not working
+        aMenu.addItem(aCheese);
+
+        //saves the menu items to the menu
+        menuDao.save(aMenu);
+
+            return "redirect:/menu/view/" + aMenu.getId();
     }
 
 

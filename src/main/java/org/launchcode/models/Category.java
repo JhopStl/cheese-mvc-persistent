@@ -41,8 +41,11 @@ public class Category {
         this.name = name;
     }
 
-    //only need to set ID, DBMS will take care of getting ID
-    public void setId(int id) {
-        this.id = id;
+    //only need to get ID, DBMS will take care of setting ID
+
+    public int getId() {return id;}
+
+    public List<Cheese> getCheeses() {
+        return cheeses;
     }
 }

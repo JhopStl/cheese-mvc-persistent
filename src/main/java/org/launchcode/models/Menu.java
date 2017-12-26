@@ -37,7 +37,7 @@ public class Menu {
     //utility methods
 
     //adds given item to list of cheeses
-    public void addItem(Cheese item) {
+    public void addItem(Cheese item) {cheeses.add(item);
 
     }
 
@@ -58,6 +58,9 @@ public class Menu {
         this.id = id;
     }
 
+    public void setCheeses(List<Cheese> cheeses) {
+        this.cheeses = cheeses;
+    }
     public List<Cheese> getCheeses() {
         return cheeses;
     }
